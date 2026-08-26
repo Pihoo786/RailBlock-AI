@@ -1,19 +1,63 @@
-import React, { useState } from 'react';
-import { mockSummaryStats, mockRecommendations, mockHighRiskAssets } from '../data/mockData';
+import React, { useEffect, useState } from 'react';
+import {
+  mockSummaryStats,
+  mockRecommendations,
+  mockHighRiskAssets
+} from '../data/mockData';
+import { getDashboardData, updateBlockStatus } from "../api/dashboardApi";
 
 export default function RailwayDashboard() {
+  const [summaryStats, setSummaryStats] = useState(mockSummaryStats);
   const [recommendations, setRecommendations] = useState(mockRecommendations);
+  const [highRiskAssets, setHighRiskAssets] = useState(mockHighRiskAssets);
   const [selectedRec, setSelectedRec] = useState(mockRecommendations[0]);
   const [activeTab, setActiveTab] = useState('DASHBOARD');
+  const [loading, setLoading] = useState(true);
+  const handleAction = async (id, newStatus) => {
+    try {
+      const action =
+        newStatus === "APPROVED" ? "approve" : "reject";
 
-  const handleAction = (id, newStatus) => {
-    setRecommendations((prev) =>
-      prev.map((rec) => (rec.id === id ? { ...rec, status: newStatus } : rec))
-    );
-    if (selectedRec?.id === id) {
-      setSelectedRec((prev) => ({ ...prev, status: newStatus }));
+      await updateBlockStatus(id, action);
+
+      setRecommendations((prev) =>
+        prev.map((rec) =>
+          rec.id === id ? { ...rec, status: newStatus } : rec
+        )
+      );
+
+      if (selectedRec?.id === id) {
+        setSelectedRec((prev) => ({
+          ...prev,
+          status: newStatus,
+        }));
+      }
+    } catch (error) {
+      console.error(`Failed to update block:`, error);
+      alert("Could not update this block");
     }
   };
+  useEffect(() => {
+    async function loadDashboard() {
+      try {
+        const data = await getDashboardData();
+
+        setSummaryStats(data.summaryStats);
+        setRecommendations(data.recommendations);
+        setHighRiskAssets(data.highRiskAssets);
+
+        if (data.recommendations.length > 0) {
+          setSelectedRec(data.recommendations[0]);
+        }
+      } catch (error) {
+        console.error("Dashboard API failed, using mock data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadDashboard();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F7F9FB] text-slate-800 font-sans flex flex-col md:flex-row">
@@ -103,10 +147,10 @@ export default function RailwayDashboard() {
 
         {/* Metric Summary Bar */}
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-          <MetricCard label="Active Trains on Section" value={mockSummaryStats.activeTrains} />
-          <MetricCard label="Proposed Maintenance Blocks" value={mockSummaryStats.recommendedBlocks} />
-          <MetricCard label="Train Conflicts Detected" value={mockSummaryStats.conflictsDetected} />
-          <MetricCard label="High-Risk Assets" value={mockSummaryStats.highRiskAssets} />
+          <MetricCard label="Active Trains on Section" value={summaryStats.activeTrains} />
+          <MetricCard label="Proposed Maintenance Blocks" value={summaryStats.recommendedBlocks} />
+          <MetricCard label="Train Conflicts Detected" value={summaryStats.conflictsDetected} />
+          <MetricCard label="High-Risk Assets" value={summaryStats.highRiskAssets} />
         </section>
 
         {/* Primary Screen Area: Focal Cards Stack */}
@@ -219,7 +263,7 @@ export default function RailwayDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {mockHighRiskAssets.map((asset) => (
+                  {highRiskAssets.map((asset) => (
                     <tr key={asset.id} className="hover:bg-slate-50/50 transition">
                       <td className="py-4 font-mono font-bold text-slate-900">{asset.id}</td>
                       <td className="py-4 font-bold text-xs uppercase">
