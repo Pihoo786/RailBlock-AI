@@ -17,15 +17,6 @@ app = FastAPI(
     version="0.1.0",
     description="Backend API for AI-Powered Railway Maintenance Block Planning"
 )
-create_tables()
-
-app.include_router(blocks_router)
-app.include_router(passenger_router)
-app.include_router(trains_router)
-app.include_router(maintenance_router)
-app.include_router(risk_router)
-app.include_router(assets_router)
-app.include_router(optimizer_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,6 +32,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+create_tables()
+
+app.include_router(blocks_router)
+app.include_router(passenger_router)
+app.include_router(trains_router)
+app.include_router(maintenance_router)
+app.include_router(risk_router)
+app.include_router(assets_router)
+app.include_router(optimizer_router)
+
+
 
 @app.get("/health")
 def health_check():
