@@ -1,0 +1,250 @@
+import React, { useState } from 'react';
+import { mockSummaryStats, mockRecommendations, mockHighRiskAssets } from '../data/mockData';
+
+export default function RailwayDashboard() {
+  const [recommendations, setRecommendations] = useState(mockRecommendations);
+  const [selectedRec, setSelectedRec] = useState(mockRecommendations[0]);
+
+  const handleAction = (id, newStatus) => {
+    setRecommendations(prev =>
+      prev.map(rec => rec.id === id ? { ...rec, status: newStatus } : rec)
+    );
+    if (selectedRec?.id === id) {
+      setSelectedRec(prev => ({ ...prev, status: newStatus }));
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-4 md:p-8">
+      {/* Control Room Top Banner */}
+      <header className="mb-8 border-b border-slate-800 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-3">
+            <span className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></span>
+            <h1 className="text-2xl font-black tracking-wider text-amber-400 uppercase">
+              Railway Control Centre
+            </h1>
+          </div>
+          <p className="text-xs text-slate-400 mt-1">
+            AI-Powered Automatic Maintenance Block Planning System • Corridor: NDLS-CNB
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <div className="bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg text-right">
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest">Active System Mode</p>
+            <p className="text-xs font-bold text-emerald-400">OPTIMIZATION ENGINE ONLINE</p>
+          </div>
+        </div>
+      </header>
+
+      {/* Summary Metrics Bar */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <MetricCard label="ACTIVE TRAINS ON SECTION" value={mockSummaryStats.activeTrains} border="border-blue-500/30" textColor="text-blue-400" />
+        <MetricCard label="PROPOSED MAINTENANCE BLOCKS" value={mockSummaryStats.recommendedBlocks} border="border-amber-500/30" textColor="text-amber-400" />
+        <MetricCard label="TRAIN CONFLICTS DETECTED" value={mockSummaryStats.conflictsDetected} border="border-rose-500/30" textColor="text-rose-400" />
+        <MetricCard label="HIGH-RISK ASSETS" value={mockSummaryStats.highRiskAssets} border="border-purple-500/30" textColor="text-purple-400" />
+      </div>
+
+      {/* Main Control Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* Left Column (8 cols): AI Recommendations List */}
+        <div className="lg:col-span-8 space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-sm font-bold tracking-wider text-slate-400 uppercase">
+              AI Block Recommendations ({recommendations.length})
+            </h2>
+            <span className="text-xs text-slate-500">Sorted by lowest operational disruption</span>
+          </div>
+
+          <div className="space-y-4">
+            {recommendations.map((rec) => {
+              const isSelected = selectedRec?.id === rec.id;
+              return (
+                <div
+                  key={rec.id}
+                  onClick={() => setSelectedRec(rec)}
+                  className={`bg-slate-900/90 border rounded-xl p-6 transition cursor-pointer shadow-lg relative overflow-hidden ${
+                    isSelected ? 'border-amber-500 ring-1 ring-amber-500/50' : 'border-slate-800 hover:border-slate-700'
+                  }`}
+                >
+                  {/* Card Top Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 px-2.5 py-1 rounded">
+                        {rec.id}
+                      </span>
+                      <ImpactBadge level={rec.impactLevel} />
+                    </div>
+                    <StatusBadge status={rec.status} />
+                  </div>
+
+                  {/* Section Title & Reason */}
+                  <h3 className="text-lg font-bold text-white tracking-wide mb-1">
+                    {rec.section}
+                  </h3>
+                  <p className="text-xs text-slate-400 mb-4">
+                    <strong className="text-slate-300">Job Scope:</strong> {rec.reason}
+                  </p>
+
+                  {/* Operational Data Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950/80 p-3.5 rounded-lg border border-slate-800/80 text-xs my-4">
+                    <div>
+                      <span className="text-[10px] text-slate-500 block uppercase">Window</span>
+                      <span className="font-bold text-amber-300 font-mono text-sm">{rec.startTime} – {rec.endTime}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-500 block uppercase">Combined Depts</span>
+                      <div className="flex gap-1 mt-0.5">
+                        {rec.departments.map(d => (
+                          <span key={d} className="bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded text-[10px] font-semibold">
+                            {d}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-500 block uppercase">Affected Trains</span>
+                      <span className="font-bold text-rose-400 text-sm">{rec.affectedTrainsCount}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-500 block uppercase">Est. Max Delay</span>
+                      <span className="font-bold text-slate-200 text-sm">{rec.expectedDelayMinutes} mins</span>
+                    </div>
+                  </div>
+
+                  {/* Approval Actions */}
+                  {rec.status === 'RECOMMENDED' ? (
+                    <div className="flex gap-3 mt-4 pt-2 border-t border-slate-800/60" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => handleAction(rec.id, 'APPROVED')}
+                        className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-lg text-xs tracking-wider uppercase transition shadow-lg shadow-emerald-950/50"
+                      >
+                        Approve Block
+                      </button>
+                      <button
+                        onClick={() => handleAction(rec.id, 'REJECTED')}
+                        className="flex-1 bg-slate-800 hover:bg-rose-950/80 hover:text-rose-300 border border-slate-700 hover:border-rose-800 text-slate-300 font-bold py-2 px-4 rounded-lg text-xs tracking-wider uppercase transition"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mt-3 pt-2 border-t border-slate-800/60 text-xs text-slate-400 italic">
+                      Decision logged for {rec.id}: <strong className="text-white uppercase">{rec.status}</strong>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right Column (4 cols): Detailed Inspector & Asset Priority */}
+        <div className="lg:col-span-4 space-y-6">
+          
+          {/* Affected Trains Detail Card */}
+          <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-5 shadow-lg">
+            <h2 className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-3">
+              Affected Trains Inspector ({selectedRec?.id})
+            </h2>
+
+            {selectedRec?.affectedTrainsList?.length > 0 ? (
+              <div className="space-y-3">
+                {selectedRec.affectedTrainsList.map((train) => (
+                  <div key={train.trainNo} className="bg-slate-950 border border-slate-800 p-3 rounded-lg text-xs">
+                    <div className="flex justify-between font-bold text-slate-200">
+                      <span>#{train.trainNo}</span>
+                      <span className="text-amber-400">{train.scheduledTime}</span>
+                    </div>
+                    <p className="text-slate-400 text-[11px] mt-0.5">{train.name}</p>
+                    <div className="mt-2 pt-2 border-t border-slate-900 flex justify-between text-[10px]">
+                      <span className="text-slate-500">Projected Delay:</span>
+                      <span className="font-bold text-rose-400">+{train.potentialDelay}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500 italic py-4 text-center">No train conflicts for selected block.</p>
+            )}
+          </div>
+
+          {/* High Risk Asset Priority Panel */}
+          <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-5 shadow-lg">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xs font-bold tracking-wider text-slate-400 uppercase">
+                Critical Asset Risk Queue
+              </h2>
+              <span className="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20">
+                Person 2 Feeds
+              </span>
+            </div>
+
+            <div className="divide-y divide-slate-800">
+              {mockHighRiskAssets.map((asset) => (
+                <div key={asset.id} className="py-3 flex justify-between items-center text-xs">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-slate-200">{asset.id}</span>
+                      <span className="text-[10px] text-slate-500">({asset.department})</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-0.5">{asset.location}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                      asset.priority === 'CRITICAL' 
+                        ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' 
+                        : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                    }`}>
+                      Risk: {asset.riskScore}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+/* Helper UI Sub-Components */
+function MetricCard({ label, value, border, textColor }) {
+  return (
+    <div className={`bg-slate-900/80 border ${border} p-4 rounded-xl shadow-lg`}>
+      <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">{label}</p>
+      <p className={`text-2xl md:text-3xl font-black mt-1 ${textColor}`}>{value}</p>
+    </div>
+  );
+}
+
+function StatusBadge({ status }) {
+  const styles = {
+    RECOMMENDED: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+    APPROVED: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+    REJECTED: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
+  };
+  return (
+    <span className={`text-[10px] font-black tracking-widest px-2.5 py-1 rounded-full border uppercase ${styles[status]}`}>
+      ● {status}
+    </span>
+  );
+}
+
+function ImpactBadge({ level }) {
+  const styles = {
+    LOW: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+    MEDIUM: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+    HIGH: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
+  };
+  return (
+    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${styles[level]}`}>
+      {level} IMPACT
+    </span>
+  );
+}
