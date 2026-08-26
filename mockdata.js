@@ -5,7 +5,7 @@ export const mockSummaryStats = {
   highRiskAssets: 5,
 };
 
-export const mockRecommendations = [
+export const mockRecommendations = [ 
   {
     id: "REC-101",
     section: "New Delhi - Kanpur Section (Km 142-148)",
