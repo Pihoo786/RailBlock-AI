@@ -10,6 +10,7 @@ export default function RouteStrip({ section }) {
       <div className="relative h-1.5 bg-gray-200 rounded-full">
         <div className="absolute inset-0 bg-amber-400 rounded-full opacity-70" />
         <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-sm">🔧</span>
+        <span className="absolute -top-2 text-base animate-train">🚆</span>
       </div>
     </div>
   );

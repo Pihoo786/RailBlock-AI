@@ -1,1 +1,10 @@
 @import "tailwindcss";
+@keyframes train-move {
+  0% { left: 4%; }
+  50% { left: 88%; }
+  100% { left: 4%; }
+}
+
+.animate-train {
+  animation: train-move 6s ease-in-out infinite;
+}
