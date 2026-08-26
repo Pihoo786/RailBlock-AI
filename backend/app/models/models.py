@@ -6,17 +6,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base
 
 
-class Train(Base):
-    __tablename__ = "trains"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    train_number: Mapped[str] = mapped_column(String(20), unique=True, index=True)
-    train_name: Mapped[str] = mapped_column(String(100))
-    source: Mapped[str] = mapped_column(String(100))
-    destination: Mapped[str] = mapped_column(String(100))
-    section: Mapped[str] = mapped_column(String(100))
-
-
 class Asset(Base):
     __tablename__ = "assets"
 
@@ -65,6 +54,10 @@ class Block(Base):
     __tablename__ = "blocks"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    train_number: Mapped[str] = mapped_column(
+        String(20),
+        index=True
+    )
 
     section: Mapped[str] = mapped_column(String(100))
 
@@ -83,3 +76,40 @@ class Block(Base):
         String(20),
         default="RECOMMENDED"
     )
+
+class Train(Base):
+    __tablename__ = "trains"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    train_number: Mapped[str] = mapped_column(
+        String(20),
+        unique=True,
+        index=True
+    )
+
+    train_name: Mapped[str] = mapped_column(
+        String(100)
+    )
+
+    source: Mapped[str] = mapped_column(
+        String(100)
+    )
+
+    destination: Mapped[str] = mapped_column(
+        String(100)
+    )
+
+    section: Mapped[str] = mapped_column(
+        String(100)
+    )
+
+    entry_time: Mapped[str] = mapped_column(
+        String(5)
+    )
+
+    exit_time: Mapped[str] = mapped_column(
+        String(5)
+    )
+
+

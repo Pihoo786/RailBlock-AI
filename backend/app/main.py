@@ -2,6 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import test_database_connection
 from app.database import create_tables
+from app.routes.blocks import router as blocks_router
+from app.routes.passenger import router as passenger_router
+from app.routes.trains import router as trains_router
+from app.routes.maintenance import router as maintenance_router
+from app.routes.risk import router as risk_router
+from app.routes.assets import router as assets_router
+from app.routes.optimizer_routes import router as optimizer_router
 
 
 
@@ -11,6 +18,15 @@ app = FastAPI(
     description="Backend API for AI-Powered Railway Maintenance Block Planning"
 )
 create_tables()
+
+app.include_router(blocks_router)
+app.include_router(passenger_router)
+app.include_router(trains_router)
+app.include_router(maintenance_router)
+app.include_router(risk_router)
+app.include_router(assets_router)
+app.include_router(optimizer_router)
+
 
 app.add_middleware(
     CORSMiddleware,
