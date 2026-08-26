@@ -3,10 +3,9 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.models import Asset
-from app.schemas.risk import (
-    RiskCalculateRequest,
-    RiskResponse
-)
+from app.schemas.risk import RiskCalculateRequest, RiskResponse
+
+from risk.ml_risk_module import calculate_risk_score, get_priority
 
 
 router = APIRouter(
@@ -31,23 +30,23 @@ def calculate_risk(
             detail="Asset not found"
         )
 
-    # Weighted risk calculation
-    risk_score = (
-        (1 - asset.condition_score) * 0.35
-        + asset.criticality * 0.30
-        + asset.overdue_score * 0.20
-        + 0.15
-    )
+    # Convert database asset into P2's risk engine format
+    asset_data = {
+        "asset_id": asset.asset_code,
+        "condition_score": asset.condition_score,
+        "criticality_score": asset.criticality,
 
-    # Keep score between 0 and 1
-    risk_score = max(0, min(1, risk_score))
+        # Our DB already stores this as a normalized 0-1 score.
+        # P2's module expects days, so convert it to a 0-100 scale.
+        "days_overdue": asset.overdue_score * 100,
 
-    if risk_score >= 0.75:
-        priority = "HIGH"
-    elif risk_score >= 0.50:
-        priority = "MEDIUM"
-    else:
-        priority = "LOW"
+        # Not currently stored in our Asset table
+        "maintenance_history": 0,
+        "safety_importance": 3.0
+    }
+
+    risk_score = calculate_risk_score(asset_data)
+    priority = get_priority(risk_score)
 
     asset.risk_score = risk_score
     asset.priority = priority
