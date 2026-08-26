@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://railblock-ai-backend.onrender.com/docs";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://railblock-ai-backend.onrender.com";
 
 async function fetchJson(endpoint) {
   const response = await fetch(`${BASE_URL}${endpoint}`);
