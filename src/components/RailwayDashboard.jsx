@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import {
-  mockSummaryStats,
-  mockRecommendations,
-  mockHighRiskAssets
-} from '../data/mockData';
 import { getDashboardData, updateBlockStatus } from "../api/dashboardApi";
 
 export default function RailwayDashboard() {
-  const [summaryStats, setSummaryStats] = useState(mockSummaryStats);
-  const [recommendations, setRecommendations] = useState(mockRecommendations);
-  const [highRiskAssets, setHighRiskAssets] = useState(mockHighRiskAssets);
-  const [selectedRec, setSelectedRec] = useState(mockRecommendations[0]);
+  const [summaryStats, setSummaryStats] = useState({
+    activeTrains: 0,
+    recommendedBlocks: 0,
+    conflictsDetected: 0,
+    highRiskAssets: 0,
+  });
+
+  const [recommendations, setRecommendations] = useState([]);
+  const [highRiskAssets, setHighRiskAssets] = useState([]);
+  const [selectedRec, setSelectedRec] = useState(null);
   const [activeTab, setActiveTab] = useState('DASHBOARD');
   const [loading, setLoading] = useState(true);
   const handleAction = async (id, newStatus) => {
@@ -50,7 +51,7 @@ export default function RailwayDashboard() {
           setSelectedRec(data.recommendations[0]);
         }
       } catch (error) {
-        console.error("Dashboard API failed, using mock data:", error);
+        console.error("Dashboard API failed:", error);
       } finally {
         setLoading(false);
       }
