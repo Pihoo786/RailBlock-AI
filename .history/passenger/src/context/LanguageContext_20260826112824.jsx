@@ -1,0 +1,71 @@
+import { createContext, useContext, useState } from "react";
+
+const translations = {
+  en: {
+    appName: "RailBlock",
+    navStatus: "Check Status",
+    navAffected: "Affected Trains",
+    navAbout: "About",
+    checkStatusTitle: "Check Train Status",
+    searchLabel: "Enter your train number",
+    searchPlaceholder: "e.g. 12627",
+    searchBtn: "Check Status",
+    recentLabel: "Recent searches",
+    notFound: (q) => `No scheduled disruptions found for train ${q}.`,
+    affectedTitle: "Currently Affected Trains",
+    affectedSub: "Trains with an approved or scheduled maintenance block today.",
+    aboutTitle: "About RailBlock",
+    aboutBody:
+      "RailBlock is a passenger-facing interface for an AI-powered railway maintenance block planning system. When engineers need to schedule track or equipment maintenance, the system finds the time window that causes the least disruption to train schedules. Once a railway official approves a block, affected passengers can check this page for the train, section, timing, and reason — without exposing any internal planning data.",
+    rowTrain: "Train",
+    rowSection: "Section",
+    rowTime: "Time",
+    rowDelay: "Expected Delay",
+    rowReason: "Reason",
+    rowStatus: "Status",
+    loading: "Loading...",
+    errorMsg: "Something went wrong. Please try again.",
+    trainNotFound: "Train number not found.",
+  },
+  hi: {
+    appName: "रेलब्लॉक",
+    navStatus: "स्थिति जांचें",
+    navAffected: "प्रभावित ट्रेनें",
+    navAbout: "जानकारी",
+    checkStatusTitle: "ट्रेन की स्थिति जांचें",
+    searchLabel: "अपना ट्रेन नंबर दर्ज करें",
+    searchPlaceholder: "जैसे 12627",
+    searchBtn: "स्थिति देखें",
+    recentLabel: "हाल की खोजें",
+    notFound: (q) => `ट्रेन ${q} के लिए कोई निर्धारित बाधा नहीं मिली।`,
+    affectedTitle: "वर्तमान में प्रभावित ट्रेनें",
+    affectedSub: "आज स्वीकृत या निर्धारित रखरखाव ब्लॉक वाली ट्रेनें।",
+    aboutTitle: "रेलब्लॉक के बारे में",
+    aboutBody:
+      "रेलब्लॉक एक AI-संचालित रेलवे रखरखाव योजना प्रणाली के लिए यात्री-सम्मुख इंटरफ़ेस है। जब इंजीनियरों को ट्रैक या उपकरण रखरखाव निर्धारित करने की आवश्यकता होती है, तो सिस्टम वह समय विंडो ढूंढता है जो ट्रेन शेड्यूल में सबसे कम बाधा उत्पन्न करे। एक बार रेलवे अधिकारी द्वारा ब्लॉक को स्वीकृत किए जाने के बाद, प्रभावित यात्री ट्रेन, खंड, समय और कारण के लिए इस पृष्ठ की जांच कर सकते हैं।",
+    rowTrain: "ट्रेन",
+    rowSection: "खंड",
+    rowTime: "समय",
+    rowDelay: "अपेक्षित देरी",
+    rowReason: "कारण",
+    rowStatus: "स्थिति",
+  },
+};
+
+const LanguageContext = createContext(null);
+
+export function LanguageProvider({ children }) {
+  const [lang, setLang] = useState("en");
+  const t = translations[lang];
+  const toggleLang = () => setLang((prev) => (prev === "en" ? "hi" : "en"));
+
+  return (
+    <LanguageContext.Provider value={{ lang, t, toggleLang }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  return useContext(LanguageContext);
+}
