@@ -1,4 +1,4 @@
-import { LayoutDashboard, FilePlus, History, LogOut, TrainFront } from "lucide-react";
+import { LayoutDashboard, FilePlus, History, LogOut, TrainFront, BarChart3 } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 
 export default function Sidebar({ activePage, onNavigate }) {
@@ -9,7 +9,8 @@ export default function Sidebar({ activePage, onNavigate }) {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "new-request", label: "New Request", icon: FilePlus },
     { id: "history", label: "Request History", icon: History },
-  ];
+    { id: "analytics", label: "Analytics", icon: BarChart3 },
+    ];
 
   return (
     <aside className="w-60 bg-white border-r border-gray-200 min-h-screen p-4 flex flex-col justify-between">

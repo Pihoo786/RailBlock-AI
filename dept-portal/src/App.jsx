@@ -6,6 +6,7 @@ import Sidebar from "./components/Sidebar";
 import DashboardPage from "./pages/DashboardPage";
 import NewRequestPage from "./pages/NewRequestPage";
 import HistoryPage from "./pages/HistoryPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
 
 function AppContent() {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ function AppContent() {
           <NewRequestPage onSubmitted={() => { setRefreshKey((k) => k + 1); setActivePage("dashboard"); }} />
         )}
         {activePage === "history" && <HistoryPage refreshKey={refreshKey} />}
+        {activePage === "analytics" && <AnalyticsPage refreshKey={refreshKey} />}
       </main>
     </div>
   );
