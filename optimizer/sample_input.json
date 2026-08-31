@@ -1,0 +1,30 @@
+{
+  "requests": [
+    {
+      "request_id": "MR-001",
+      "asset_id": "TRK-001",
+      "department": "Engineering",
+      "section": "MAS-AJJ",
+      "duration_minutes": 120,
+      "days_overdue": 45,
+      "severity": "HIGH",
+      "asset_criticality": 0.9,
+      "operational_impact": 0.7,
+      "status": "PENDING",
+      "block_type": "TRAFFIC"
+    }
+  ],
+  "ml_outputs": [
+    {
+      "request_id": "MR-001",
+      "failure_probability": 0.87,
+      "risk_band": "HIGH",
+      "model_version": "v1",
+      "top_features": ["track_condition", "overdue_days"]
+    }
+  ],
+  "trains": [
+    {"train_id": "12627", "section": "MAS-AJJ", "entry_time": "08:00", "exit_time": "08:30", "train_type": "Express"},
+    {"train_id": "16057", "section": "MAS-AJJ", "entry_time": "12:00", "exit_time": "12:45", "train_type": "Passenger"}
+  ]
+}

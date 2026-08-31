@@ -1,50 +1,54 @@
-# Person 1: Data and Optimization
+# Person 1: AI and Optimization
 
-This folder contains the rule-based maintenance block optimizer.  It is the
-prototype's decision engine: it tests possible maintenance windows, detects
-overlapping trains, estimates disruption, and recommends the least disruptive
-block.
+This module converts ML risk predictions and railway operating constraints into
+feasible maintenance-block plans. It implements the Person 1 work document.
 
-## Run the demo
+## What is included
 
-From the project root, run:
+- `priority_engine.py` - explainable decision logic over ML risk output
+- `candidate_windows.py` - traffic-safe candidate generation and conflict rule
+- `compatibility.py` - explicit Traffic/Power/Disconnection compatibility rules
+- `cp_sat_optimizer.py` - Google OR-Tools CP-SAT single, batch, and re-planning
+- `engine.py` - backwards-compatible simple optimizer used by the current API
+- `sample_input.json` and `sample_output.json` - integration examples
 
-```bash
-python3 -m optimizer.demo
-```
-
-The demo reads `data/synthetic/trains.json` and
-`data/synthetic/maintenance_jobs.json`, then prints a recommended block as
-JSON.  No external packages are required.
-
-## Run the tests
+## Install and test
 
 ```bash
-python3 -m unittest tests/test_optimizer.py
+python3 -m pip install -r backend/requirements.txt
+python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-## Main function
+## Main API
 
 ```python
-from optimizer.engine import optimize_maintenance_block
+from optimizer import optimize_plan, recommend_single
 
-result = optimize_maintenance_block(maintenance_job, trains)
+weekly_plan = optimize_plan(requests, ml_outputs, trains)
+single_result = recommend_single(request, ml_output, trains)
 ```
 
-`maintenance_job` requires `job_id`, `section`, and `duration_minutes`.
-`priority` and `risk_score` are optional until the Risk module is connected.
+`optimize_plan` accepts 10 or more pending requests and returns a plan,
+priority decisions, and clear reasons for unscheduled work.
 
-## API-ready response
+## Decision rules
 
-The result follows the shared schema and contains `block_id`, timing,
-`affected_trains`, `affected_train_ids`, `estimated_impact_minutes`,
-`impact_level`, and `status`.  It also includes `evaluated_windows`, which the
-dashboard can use to show why one block was selected.
+Priority is explainable decision logic, not ML. It combines predicted failure
+probability, asset criticality, operational impact, days overdue, and severity.
+Candidate windows use the mandatory conflict rule:
 
-## Optimization rules
+```text
+train.entry_time < block.end_time AND train.exit_time > block.start_time
+```
 
-- Candidate windows run every 30 minutes between 06:00 and 22:00 by default.
-- A train conflicts when it overlaps the proposed block on the same section.
-- Each conflicting train adds 5 estimated impact minutes.
-- The lowest disruption score wins. Risk provides a small tie-break priority.
-- `combine_compatible_jobs` groups same-section work into one shared block.
+Train occupancy is a hard constraint in this MVP. A window with a train
+conflict is not proposed. CP-SAT also prevents overlapping incompatible blocks
+on the same section and strongly penalizes unscheduled critical work.
+
+Only reviewed compatibility pairs can share a block. The default policy does
+not combine Traffic, Power, or Disconnection blocks with a different type.
+
+## Re-optimization
+
+Pass a rejected recommendation to `reoptimize_after_rejection`. Its candidate
+ID is excluded and CP-SAT returns the next best feasible block.
