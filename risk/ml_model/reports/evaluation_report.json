@@ -1,0 +1,15 @@
+{
+  "test_rows": 600,
+  "test_positive_rate": 0.028333333333333332,
+  "pr_auc": 0.05769681309966491,
+  "precision_at_20": 0.05,
+  "threshold": 0.5,
+  "precision_at_threshold": 0.1111111111111111,
+  "recall_at_threshold": 0.058823529411764705,
+  "confusion_matrix": {
+    "tn": 575,
+    "fp": 8,
+    "fn": 16,
+    "tp": 1
+  }
+}
