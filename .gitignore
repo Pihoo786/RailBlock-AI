@@ -240,3 +240,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+ 
+# ML risk model - generated/large files 
+risk/ml_model/data/*.csv 
+risk/ml_model/models/*.json 
+risk/ml_model/models/*.joblib 
+risk/ml_model/reports/*.png 
