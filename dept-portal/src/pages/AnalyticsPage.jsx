@@ -3,15 +3,17 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import { getRequests } from "../api/requestsApi";
 import { useAuth } from "../context/useAuth";
 import { STATUS_LABELS } from "../data/statuses";
+import { ROLES } from "../data/roles";
 
-const SEVERITY_COLORS = { LOW: "#64748B", MEDIUM: "#2563EB", HIGH: "#B91C1C" };
+const SEVERITY_COLORS = { LOW: "#64748B", MEDIUM: "#2563EB", HIGH: "#B91C1C", CRITICAL: "#7C2D12" };
 
 export default function AnalyticsPage({ refreshKey }) {
   const { user } = useAuth();
   const [requests, setRequests] = useState([]);
 
   useEffect(() => {
-    getRequests(user.role).then(setRequests);
+    const departmentValue = ROLES.find((r) => r.id === user.role)?.apiValue;
+    getRequests(departmentValue).then(setRequests);
   }, [user.role, refreshKey]);
 
   const statusData = Object.keys(STATUS_LABELS).map((key) => ({
@@ -19,10 +21,10 @@ export default function AnalyticsPage({ refreshKey }) {
     count: requests.filter((r) => r.status === key).length,
   }));
 
-  const severityData = ["LOW", "MEDIUM", "HIGH"].map((level) => ({
+  const severityData = ["LOW", "MEDIUM", "HIGH", "CRITICAL"].map((level) => ({
     name: level,
     value: requests.filter((r) => r.severity === level).length,
-  })).filter((d) => d.value > 0);
+  }))
 
   return (
     <div>

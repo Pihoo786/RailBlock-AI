@@ -3,6 +3,7 @@ import { ClipboardList, Activity, CheckCircle2, XCircle } from "lucide-react";
 import { getRequests } from "../api/requestsApi";
 import { useAuth } from "../context/useAuth";
 import StatusBadge from "../components/StatusBadge";
+import { ROLES } from "../data/roles";
 
 export default function DashboardPage({ refreshKey }) {
   const { user } = useAuth();
@@ -10,7 +11,8 @@ export default function DashboardPage({ refreshKey }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getRequests(user.role).then(setRequests).finally(() => setLoading(false));
+    const departmentValue = ROLES.find((r) => r.id === user.role)?.apiValue;
+    getRequests(departmentValue).then(setRequests).finally(() => setLoading(false));
   }, [user.role, refreshKey]);
 
   const total = requests.length;

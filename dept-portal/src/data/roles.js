@@ -1,5 +1,5 @@
 export const ROLES = [
-  { id: "engineering", label: "Engineering" },
-  { id: "snt", label: "Signal & Telecom" },
-  { id: "trd", label: "Traction Distribution" },
+  { id: "engineering", apiValue: "ENGINEERING", label: "Engineering" },
+  { id: "snt", apiValue: "SIGNAL_TELECOM", label: "Signal & Telecom" },
+  { id: "trd", apiValue: "TRACTION_DISTRIBUTION", label: "Traction & Distribution" },
 ];
