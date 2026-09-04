@@ -249,7 +249,51 @@ class Defect(Base):
         nullable=True
     )
 
+# ============================================================
+# SIGNAL FAILURES
+# Historical S&T failure data used by ML
+# ============================================================
 
+class SignalFailure(Base):
+    __tablename__ = "signal_failures"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True
+    )
+
+    asset_id: Mapped[int] = mapped_column(
+        ForeignKey("assets.id"),
+        index=True
+    )
+
+    failure_timestamp: Mapped[datetime] = mapped_column(
+        DateTime
+    )
+
+    failure_type: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True
+    )
+
+    restoration_timestamp: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True
+    )
+
+    downtime_minutes: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True
+    )
+
+    restored_by: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow
+    )
 # ============================================================
 # MAINTENANCE REQUESTS
 # New canonical MVP request entity

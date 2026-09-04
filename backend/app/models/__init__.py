@@ -11,4 +11,5 @@ from app.models.models import (
     AuditLog,
     MaintenanceJob,
     Train,
+    SignalFailure,
 )
