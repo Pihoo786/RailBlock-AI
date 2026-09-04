@@ -26,7 +26,7 @@ export default function RailwayDashboard() {
         <nav className="flex flex-col gap-1 text-xs font-semibold tracking-wide uppercase">
           <button
             onClick={() => setActiveTab('DASHBOARD')}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition cursor-pointer ${
               activeTab === 'DASHBOARD'
                 ? 'bg-[#EAF1F7] text-[#2C5F8A]'
                 : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -40,7 +40,7 @@ export default function RailwayDashboard() {
 
           <button
             onClick={() => setActiveTab('RECOMMENDATIONS')}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition cursor-pointer ${
               activeTab === 'RECOMMENDATIONS'
                 ? 'bg-[#EAF1F7] text-[#2C5F8A]'
                 : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -54,7 +54,7 @@ export default function RailwayDashboard() {
 
           <button
             onClick={() => setActiveTab('ASSETS')}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition cursor-pointer ${
               activeTab === 'ASSETS'
                 ? 'bg-[#EAF1F7] text-[#2C5F8A]'
                 : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -68,7 +68,7 @@ export default function RailwayDashboard() {
 
           <button
             onClick={() => setActiveTab('CONFIGURATION')}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition cursor-pointer ${
               activeTab === 'CONFIGURATION'
                 ? 'bg-[#EAF1F7] text-[#2C5F8A]'
                 : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -101,108 +101,109 @@ export default function RailwayDashboard() {
           </div>
         </header>
 
-        {/* Metric Summary Bar */}
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-          <MetricCard label="Active Trains on Section" value={mockSummaryStats.activeTrains} />
-          <MetricCard label="Proposed Maintenance Blocks" value={mockSummaryStats.recommendedBlocks} />
-          <MetricCard label="Train Conflicts Detected" value={mockSummaryStats.conflictsDetected} />
-          <MetricCard label="High-Risk Assets" value={mockSummaryStats.highRiskAssets} />
-        </section>
+        {/* TAB 1: MAIN DASHBOARD VIEW */}
+        {(activeTab === 'DASHBOARD' || activeTab === 'RECOMMENDATIONS') && (
+          <div className="space-y-8">
+            {/* Metric Summary Bar */}
+            <section className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+              <MetricCard label="Active Trains on Section" value={mockSummaryStats.activeTrains} />
+              <MetricCard label="Proposed Maintenance Blocks" value={mockSummaryStats.recommendedBlocks} />
+              <MetricCard label="Train Conflicts Detected" value={mockSummaryStats.conflictsDetected} />
+              <MetricCard label="High-Risk Assets" value={mockSummaryStats.highRiskAssets} />
+            </section>
 
-        {/* Primary Screen Area: Focal Cards Stack */}
-        <div className="space-y-8">
-          
-          {/* Main Focal Card: Primary Block Recommendation */}
-          <section>
-            <h2 className="text-base font-bold text-slate-900 mb-4">
-              AI Block Recommendations ({recommendations.length})
-            </h2>
+            {/* AI Block Recommendations */}
+            <section>
+              <h2 className="text-base font-bold text-slate-900 mb-4">
+                AI Block Recommendations ({recommendations.length})
+              </h2>
 
-            <div className="space-y-4">
-              {recommendations.map((rec) => (
-                <div
-                  key={rec.id}
-                  onClick={() => setSelectedRec(rec)}
-                  className={`bg-white rounded-2xl p-6 md:p-8 shadow-sm border transition cursor-pointer ${
-                    selectedRec?.id === rec.id
-                      ? 'border-[#2C5F8A] ring-1 ring-[#2C5F8A]/20'
-                      : 'border-slate-200/80 hover:border-slate-300'
-                  }`}
-                >
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-semibold text-slate-500 font-mono">
-                          {rec.id}
-                        </span>
-                        <span className="text-[11px] font-bold tracking-wider text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md uppercase">
-                          {rec.impactLevel} Impact
-                        </span>
-                        <StatusWord status={rec.status} />
-                      </div>
-
-                      <h3 className="text-xl font-bold text-[#2C5F8A]">
-                        {rec.section}
-                      </h3>
-                    </div>
-
-                    {/* Operational Quick Metrics */}
-                    <div className="flex items-center gap-6 text-sm text-slate-600">
+              <div className="space-y-4">
+                {recommendations.map((rec) => (
+                  <div
+                    key={rec.id}
+                    onClick={() => setSelectedRec(rec)}
+                    className={`bg-white rounded-2xl p-6 md:p-8 shadow-sm border transition cursor-pointer ${
+                      selectedRec?.id === rec.id
+                        ? 'border-[#2C5F8A] ring-1 ring-[#2C5F8A]/20'
+                        : 'border-slate-200/80 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div>
-                        <span className="text-xs text-slate-400 block font-medium">Affected Trains:</span>
-                        <span className="font-bold text-slate-800">{rec.affectedTrainsCount}</span>
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-sm font-semibold text-slate-500 font-mono">
+                            {rec.id}
+                          </span>
+                          <span className="text-[11px] font-bold tracking-wider text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md uppercase">
+                            {rec.impactLevel} Impact
+                          </span>
+                          <StatusWord status={rec.status} />
+                        </div>
+
+                        <h3 className="text-xl font-bold text-[#2C5F8A]">
+                          {rec.section}
+                        </h3>
                       </div>
-                      <div className="h-8 w-px bg-slate-200"></div>
-                      <div>
-                        <span className="text-xs text-slate-400 block font-medium">Est. Max Delay:</span>
-                        <span className="font-bold text-slate-800">{rec.expectedDelayMinutes} mins</span>
+
+                      <div className="flex items-center gap-6 text-sm text-slate-600">
+                        <div>
+                          <span className="text-xs text-slate-400 block font-medium">Affected Trains:</span>
+                          <span className="font-bold text-slate-800">{rec.affectedTrainsCount}</span>
+                        </div>
+                        <div className="h-8 w-px bg-slate-200"></div>
+                        <div>
+                          <span className="text-xs text-slate-400 block font-medium">Est. Max Delay:</span>
+                          <span className="font-bold text-slate-800">{rec.expectedDelayMinutes} mins</span>
+                        </div>
                       </div>
                     </div>
+
+                    <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <p className="text-xs text-slate-600">
+                          <strong className="text-slate-800 font-semibold">Job Scope:</strong> {rec.reason}
+                        </p>
+                        <p className="text-xs text-slate-600">
+                          <strong className="text-slate-800 font-semibold">Window:</strong> {rec.startTime} – {rec.endTime}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {rec.departments.map((dept) => (
+                          <span key={dept} className="text-xs text-slate-600 bg-slate-100 px-3 py-1 rounded-md font-medium">
+                            #{dept}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {rec.status === 'RECOMMENDED' && (
+                      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end gap-3" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => handleAction(rec.id, 'APPROVED')}
+                          className="bg-[#2C5F8A] hover:bg-[#234b6e] text-white text-xs font-bold px-6 py-2.5 rounded-xl transition shadow-sm cursor-pointer"
+                        >
+                          Approve Block
+                        </button>
+                        <button
+                          onClick={() => handleAction(rec.id, 'REJECTED')}
+                          className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-6 py-2.5 rounded-xl transition cursor-pointer"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    )}
                   </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        )}
 
-                  <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <p className="text-xs text-slate-600">
-                        <strong className="text-slate-800 font-semibold">Job Scope:</strong> {rec.reason}
-                      </p>
-                      <p className="text-xs text-slate-600">
-                        <strong className="text-slate-800 font-semibold">Window:</strong> {rec.startTime} – {rec.endTime}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {rec.departments.map((dept) => (
-                        <span key={dept} className="text-xs text-slate-600 bg-slate-100 px-3 py-1 rounded-md font-medium">
-                          #{dept}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  {rec.status === 'RECOMMENDED' && (
-                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end gap-3" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        onClick={() => handleAction(rec.id, 'APPROVED')}
-                        className="bg-[#2C5F8A] hover:bg-[#234b6e] text-white text-xs font-bold px-6 py-2.5 rounded-xl transition shadow-sm"
-                      >
-                        Approve Block
-                      </button>
-                      <button
-                        onClick={() => handleAction(rec.id, 'REJECTED')}
-                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-6 py-2.5 rounded-xl transition"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Critical Asset Risk Queue Focal Card Table */}
-          <section className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200/80">
+        {/* TAB 2: ASSETS VIEW */}
+        {(activeTab === 'DASHBOARD' || activeTab === 'ASSETS') && (
+          <section className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200/80 mt-8">
             <h2 className="text-base font-bold text-slate-900 mb-6">
               Critical Asset Risk Queue
             </h2>
@@ -236,14 +237,30 @@ export default function RailwayDashboard() {
               </table>
             </div>
           </section>
+        )}
 
-        </div>
+        {/* TAB 3: CONFIGURATION VIEW */}
+        {activeTab === 'CONFIGURATION' && (
+          <section className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200/80">
+            <h2 className="text-lg font-bold text-slate-900 mb-4">System Configuration</h2>
+            <p className="text-sm text-slate-600 mb-6">Adjust optimization parameters and risk thresholds for automated planning.</p>
+            <div className="space-y-4 max-w-md">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-2 uppercase">Max Allowed Train Delay (Minutes)</label>
+                <input type="number" defaultValue={15} className="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#2C5F8A]" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-2 uppercase">Critical Risk Score Cutoff</label>
+                <input type="number" step="0.05" defaultValue={0.80} className="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#2C5F8A]" />
+              </div>
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
 }
 
-/* Rounded Clean Metric Card Component */
 function MetricCard({ label, value }) {
   return (
     <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
@@ -253,7 +270,6 @@ function MetricCard({ label, value }) {
   );
 }
 
-/* Status Words — Strictly Text Formatting without heavy backgrounds */
 function StatusWord({ status }) {
   if (status === 'APPROVED') {
     return (
