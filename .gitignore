@@ -240,6 +240,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
 # Dataset files
 dataset/*.zip
 dataset/extracted/
@@ -252,3 +253,11 @@ backend/.env
 __pycache__/
 *.pyc
 .venv/
+
+ 
+# ML risk model - generated/large files 
+risk/ml_model/data/*.csv 
+risk/ml_model/models/*.json 
+risk/ml_model/models/*.joblib 
+risk/ml_model/reports/*.png 
+
