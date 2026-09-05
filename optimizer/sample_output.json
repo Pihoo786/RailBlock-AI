@@ -1,0 +1,16 @@
+{
+  "recommended_block": {
+    "request_id": "MR-001",
+    "section": "MAS-AJJ",
+    "start_time": "06:00",
+    "end_time": "08:00",
+    "affected_trains": 0,
+    "expected_disruption_minutes": 0,
+    "status": "RECOMMENDED"
+  },
+  "priority": {
+    "priority_score": 0.803,
+    "priority_band": "HIGH",
+    "priority_reasons": ["High predicted failure probability (87%).", "Asset is operationally critical."]
+  }
+}

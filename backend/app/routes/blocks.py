@@ -1,16 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+
+
+from app.models.models import Block, AuditLog
 from app.database import get_db
 from app.models.models import Block
 from app.schemas.block import BlockCreate, BlockResponse, OptimizationResponse
 
 from datetime import datetime
 
-from app.models.models import Block, MaintenanceJob, Asset, Train
+from app.models.models import Block, MaintenanceJob, Asset, Train, AuditLog
 from pathlib import Path
 import sys
-
+from app.database import get_db
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 if str(PROJECT_ROOT) not in sys.path:
@@ -256,3 +259,74 @@ def optimize_block(
     db.refresh(new_block)
 
     return new_block
+
+@router.post("/{block_id}/activate")
+def activate_block(block_id: int, db: Session = Depends(get_db)):
+    block = db.query(Block).filter(Block.id == block_id).first()
+
+    if not block:
+        raise HTTPException(status_code=404, detail="Block not found")
+
+    if block.status != "APPROVED":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Block cannot be activated from status {block.status}"
+        )
+
+    old_status = block.status
+    block.status = "ACTIVE"
+
+    audit = AuditLog(
+        entity_type="BLOCK",
+        entity_id=str(block.id),
+        action="STATUS_CHANGE",
+        old_status=old_status,
+        new_status="ACTIVE",
+        details={"block_id": block.id}
+    )
+
+    db.add(audit)
+    db.commit()
+    db.refresh(block)
+
+    return {
+        "message": "Block activated successfully",
+        "block_id": block.id,
+        "status": block.status
+    }
+
+
+@router.post("/{block_id}/complete")
+def complete_block(block_id: int, db: Session = Depends(get_db)):
+    block = db.query(Block).filter(Block.id == block_id).first()
+
+    if not block:
+        raise HTTPException(status_code=404, detail="Block not found")
+
+    if block.status != "ACTIVE":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Block cannot be completed from status {block.status}"
+        )
+
+    old_status = block.status
+    block.status = "COMPLETED"
+
+    audit = AuditLog(
+        entity_type="BLOCK",
+        entity_id=str(block.id),
+        action="STATUS_CHANGE",
+        old_status=old_status,
+        new_status="COMPLETED",
+        details={"block_id": block.id}
+    )
+
+    db.add(audit)
+    db.commit()
+    db.refresh(block)
+
+    return {
+        "message": "Block completed successfully",
+        "block_id": block.id,
+        "status": block.status
+    }

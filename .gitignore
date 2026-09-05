@@ -254,10 +254,8 @@ __pycache__/
 *.pyc
 .venv/
 
- 
-# ML risk model - generated/large files 
-risk/ml_model/data/*.csv 
-risk/ml_model/models/*.json 
-risk/ml_model/models/*.joblib 
-risk/ml_model/reports/*.png 
+# ML risk model - generated training data
+risk/ml_model/src/data/*.csv
 
+# ML evaluation plots
+risk/ml_model/reports/*.png

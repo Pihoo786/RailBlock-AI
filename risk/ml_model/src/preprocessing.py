@@ -5,7 +5,11 @@ ONE preprocessing pipeline, used by both train.py and predict.py.
 This is the #1 hackathon bug to avoid: training-time and prediction-time
 preprocessing silently drifting apart. Import from here, don't rewrite it.
 """
+from pathlib import Path
 
+SRC_DIR = Path(__file__).resolve().parent
+DATA_DIR = SRC_DIR / "data"
+MODELS_DIR = SRC_DIR.parent / "models"
 import joblib
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -39,22 +43,27 @@ def build_pipeline():
         ("cat", categorical, CATEGORICAL_FEATURES),
     ])
 
+def load_training_table(path=None):
+    if path is None:
+        path = DATA_DIR / "training_table.csv"
 
-def load_training_table(path="data/training_table.csv"):
     df = pd.read_csv(path, parse_dates=["requested_at"])
     return df
-
 
 def get_feature_names(fitted_pipeline):
     """Flat list of output column names after the ColumnTransformer, for SHAP labeling."""
     cat_encoder = fitted_pipeline.named_transformers_["cat"].named_steps["onehot"]
     cat_names = list(cat_encoder.get_feature_names_out(CATEGORICAL_FEATURES))
     return NUMERIC_FEATURES + cat_names
+def save_pipeline(pipeline, path=None):
+    if path is None:
+        path = MODELS_DIR / "preprocessing.joblib"
 
-
-def save_pipeline(pipeline, path="models/preprocessing.joblib"):
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(pipeline, path)
 
+def load_pipeline(path=None):
+    if path is None:
+        path = MODELS_DIR / "preprocessing.joblib"
 
-def load_pipeline(path="models/preprocessing.joblib"):
     return joblib.load(path)

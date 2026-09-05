@@ -9,7 +9,7 @@ Run:
 Requires:
     pip install xgboost scikit-learn pandas joblib
 """
-
+from pathlib import Path
 import joblib
 import numpy as np
 import xgboost as xgb
@@ -19,8 +19,12 @@ from preprocessing import (
     NUMERIC_FEATURES, CATEGORICAL_FEATURES, TARGET,
 )
 
-MODEL_PATH = "models/xgb_v1.json"
-PIPELINE_PATH = "models/preprocessing.joblib"
+SRC_DIR = Path(__file__).resolve().parent
+MODELS_DIR = SRC_DIR.parent / "models"
+
+MODEL_PATH = MODELS_DIR / "xgb_v1.json"
+PIPELINE_PATH = MODELS_DIR / "preprocessing.joblib"
+SPLIT_PATH = MODELS_DIR / "split_indices.joblib"
 
 
 def chronological_split(df):
@@ -59,11 +63,11 @@ def main():
     scale_pos_weight=scale_pos_weight, eval_metric="aucpr", random_state=42,
 )
     model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
-
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
     model.save_model(MODEL_PATH)
     save_pipeline(pipeline, PIPELINE_PATH)
     # also persist the raw val/test splits so evaluate.py doesn't need to re-split
-    joblib.dump({"test_idx": test.index.tolist()}, "models/split_indices.joblib")
+    joblib.dump({"test_idx": test.index.tolist()}, SPLIT_PATH)
     print(f"Saved model -> {MODEL_PATH}")
     print(f"Saved pipeline -> {PIPELINE_PATH}")
 

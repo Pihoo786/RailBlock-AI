@@ -13,16 +13,17 @@ from uuid import uuid4
 TIME_FORMAT = "%H:%M"
 PRIORITY_RISK = {"LOW": 0.25, "MEDIUM": 0.60, "HIGH": 0.90}
 
-
 def _minutes(value: str) -> int:
     """Convert a HH:MM time to minutes after midnight."""
+    if value == "24:00":
+        return 24 * 60
+
     try:
         parsed = datetime.strptime(value, TIME_FORMAT)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"Time must use HH:MM format; got {value!r}.") from exc
+
     return parsed.hour * 60 + parsed.minute
-
-
 def _time(value: int) -> str:
     """Convert minutes after midnight to HH:MM, allowing an end time of 24:00."""
     if value == 24 * 60:
@@ -64,21 +65,28 @@ def find_conflicting_trains(
 ) -> list[dict[str, Any]]:
     """Return timetable entries overlapping the proposed block on its section."""
     block_start, block_end = _minutes(start_time), _minutes(end_time)
+
     if block_start >= block_end:
         raise ValueError("Block start_time must be before end_time.")
 
     conflicts = []
+
     for train in trains:
         if train.get("section") != section:
             continue
+
         train_start = _minutes(train["entry_time"])
         train_end = _minutes(train["exit_time"])
-        if train_start >= train_end:
-            raise ValueError(f"Train {train.get('train_id', '<unknown>')} has an invalid timetable window.")
+
+        # Trains can legitimately cross midnight.
+        # Example: 23:58 -> 00:20 means 23:58 -> 24:20.
+        if train_end <= train_start:
+            train_end += 24 * 60
+
         if _overlaps(block_start, block_end, train_start, train_end):
             conflicts.append(train)
-    return conflicts
 
+    return conflicts
 
 def _risk_score(job: dict[str, Any]) -> float:
     raw_score = job.get("risk_score", PRIORITY_RISK.get(job.get("priority", "MEDIUM"), 0.60))

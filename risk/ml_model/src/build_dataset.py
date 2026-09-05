@@ -16,9 +16,13 @@ Output:
 
 import pandas as pd
 import numpy as np
+from pathlib import Path
 
-DATA_DIR = "data"
-OUT_PATH = f"{DATA_DIR}/training_table.csv"
+SRC_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SRC_DIR.parents[2]
+
+DATA_DIR = PROJECT_ROOT / "dataset" / "extracted" / "railblock_dataset"
+OUT_PATH = SRC_DIR / "data" / "training_table.csv"
 
 # Assumed standard maintenance interval per department, in days.
 # Used only to derive `days_overdue` from `days_since_last_maintenance`
@@ -33,14 +37,28 @@ MAINTENANCE_INTERVAL_DAYS = {
 
 SEVERITY_ORDER = {"routine": 0, "minor": 1, "moderate": 2, "severe": 3, "urgent": 4}
 
-
 def load_raw():
-    assets = pd.read_csv(f"{DATA_DIR}/assets.csv", parse_dates=["install_date", "last_maintenance_date", "last_usfd_test_date"])
-    defects = pd.read_csv(f"{DATA_DIR}/defects.csv", parse_dates=["reported_at"])
-    block_requests = pd.read_csv(f"{DATA_DIR}/block_requests.csv", parse_dates=["requested_at"])
-    outcomes = pd.read_csv(f"{DATA_DIR}/historical_outcomes.csv", parse_dates=["observed_at"])
-    sections = pd.read_csv(f"{DATA_DIR}/sections.csv")
-    signal_failures = pd.read_csv(f"{DATA_DIR}/signal_failures.csv", parse_dates=["failure_timestamp", "restoration_timestamp"])
+    assets = pd.read_csv(
+        DATA_DIR / "assets.csv",
+        parse_dates=["install_date", "last_maintenance_date", "last_usfd_test_date"],
+    )
+    defects = pd.read_csv(
+        DATA_DIR / "defects.csv",
+        parse_dates=["reported_at"],
+    )
+    block_requests = pd.read_csv(
+        DATA_DIR / "block_requests.csv",
+        parse_dates=["requested_at"],
+    )
+    outcomes = pd.read_csv(
+        DATA_DIR / "historical_outcomes.csv",
+        parse_dates=["observed_at"],
+    )
+    sections = pd.read_csv(DATA_DIR / "sections.csv")
+    signal_failures = pd.read_csv(
+        DATA_DIR / "signal_failures.csv",
+        parse_dates=["failure_timestamp", "restoration_timestamp"],
+    )
     return assets, defects, block_requests, outcomes, sections, signal_failures
 
 
@@ -137,6 +155,7 @@ def build():
     ]
 
     out = df[feature_cols].sort_values("requested_at").reset_index(drop=True)
+    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(OUT_PATH, index=False)
     print(f"Wrote {len(out)} rows -> {OUT_PATH}")
     print(f"Positive rate: {out['failed_within_30_days'].mean():.4f}")

@@ -12,12 +12,18 @@ Run:
 """
 
 import json
-
+from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import xgboost as xgb
+
+SRC_DIR = Path(__file__).resolve().parent
+REPORTS_DIR = SRC_DIR.parent / "reports"
+
+REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import (
     average_precision_score, confusion_matrix, precision_score, recall_score,
@@ -27,8 +33,10 @@ from preprocessing import (
     load_training_table, load_pipeline, NUMERIC_FEATURES, CATEGORICAL_FEATURES, TARGET,
 )
 from train import chronological_split
+from pathlib import Path
 
-MODEL_PATH = "models/xgb_v1.json"
+SRC_DIR = Path(__file__).resolve().parent
+MODEL_PATH = SRC_DIR.parent / "models" / "xgb_v1.json"
 THRESHOLD = 0.5  # tune this after looking at the PR curve / your ops constraints
 K = 20           # Precision@K: of the K riskiest assets this model flags, how many actually fail?
 
@@ -43,7 +51,7 @@ def main():
     y_test = test[TARGET].values
 
     model = xgb.XGBClassifier()
-    model.load_model(MODEL_PATH)
+    model.load_model(str(MODEL_PATH))
     probs = model.predict_proba(X_test)[:, 1]
 
     from sklearn.metrics import precision_recall_curve
@@ -83,7 +91,7 @@ def main():
     plt.ylabel("observed failure rate")
     plt.title("Calibration curve")
     plt.legend()
-    plt.savefig("reports/calibration_curve.png", bbox_inches="tight")
+    plt.savefig(REPORTS_DIR / "calibration_curve.png", bbox_inches="tight")
 
     report = {
         "test_rows": len(test),
@@ -99,7 +107,7 @@ def main():
         },
     }
 
-    with open("reports/evaluation_report.json", "w") as f:
+    with open(REPORTS_DIR / "evaluation_report.json", "w") as f:
         json.dump(report, f, indent=2)
 
     md = f"""# Evaluation Report
@@ -127,7 +135,7 @@ rate, a model that always predicts "no failure" scores ~97% accuracy
 while being useless. PR-AUC and Precision@K are the numbers that
 actually reflect whether this model finds the assets that fail.
 """
-    with open("reports/evaluation_report.md", "w") as f:
+    with open(REPORTS_DIR / "evaluation_report.md", "w") as f:
         f.write(md)
 
     print(md)
