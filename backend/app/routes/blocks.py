@@ -80,7 +80,27 @@ def approve_block(
             detail="Block not found"
         )
 
+    if block.status != "RECOMMENDED":
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Block cannot be approved from status "
+                f"{block.status}."
+            ),
+        )
+
     block.status = "APPROVED"
+
+    if block.status != "RECOMMENDED":
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Block cannot be rejected from status "
+                f"{block.status}."
+            ),
+        )
+
+    block.status = "REJECTED"
 
     db.commit()
     db.refresh(block)

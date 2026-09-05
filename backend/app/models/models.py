@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from sqlalchemy.orm import relationship
 from sqlalchemy import (
     String,
     Integer,
@@ -8,6 +8,9 @@ from sqlalchemy import (
     ForeignKey,
     Text,
     Boolean,
+    Column,
+    Date,
+    JSON,
 )
 
 from sqlalchemy.dialects.postgresql import JSONB
@@ -745,4 +748,78 @@ class Train(Base):
 
     exit_time: Mapped[str] = mapped_column(
         String(5)
+    )
+class RollingStockSchedule(Base):
+    __tablename__ = "rolling_stock_schedule"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    asset_id = Column(
+        Integer,
+        ForeignKey("assets.id"),
+        nullable=False,
+        index=True,
+    )
+
+    shed_location = Column(String(100), nullable=True)
+
+    status = Column(
+        String(50),
+        nullable=False,
+        default="AVAILABLE",
+    )
+
+    overhaul_start = Column(DateTime, nullable=True)
+    overhaul_end = Column(DateTime, nullable=True)
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+    )
+
+    asset = relationship("Asset")
+
+
+class LCHazardEvent(Base):
+    __tablename__ = "lc_hazard_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    lc_id = Column(
+        String(100),
+        nullable=False,
+        index=True,
+    )
+
+    section_id = Column(
+        String(100),
+        nullable=False,
+        index=True,
+    )
+
+    hazard_type = Column(
+        String(50),
+        nullable=False,
+    )
+
+    severity = Column(
+        String(20),
+        nullable=False,
+    )
+
+    detected_at = Column(
+        DateTime,
+        nullable=False,
+    )
+
+    resolved_at = Column(
+        DateTime,
+        nullable=True,
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
     )
