@@ -239,9 +239,7 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
-
-# Dataset files
+*.sw?# Dataset files
 dataset/*.zip
 dataset/extracted/
 
@@ -259,3 +257,6 @@ risk/ml_model/src/data/*.csv
 
 # ML evaluation plots
 risk/ml_model/reports/*.png
+
+# Local history snapshots
+.history/
