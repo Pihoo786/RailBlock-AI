@@ -19,19 +19,21 @@ SEVERITY_RANK = {
     "URGENT": 4,
 }
 
+def days_between(start, end):
+    if start is None or end is None:
+        return 0
 
-def days_between(
-    start: datetime | None,
-    end: datetime,
-) -> float:
-    if start is None:
-        return 0.0
+    # Normalize timezone-aware datetimes to naive UTC
+    if start.tzinfo is not None:
+        start = start.replace(tzinfo=None)
+
+    if end.tzinfo is not None:
+        end = end.replace(tzinfo=None)
 
     return max(
-        0.0,
-        (end - start).total_seconds() / 86400,
+        0,
+        int((end - start).total_seconds() / 86400),
     )
-
 
 def build_ml_features(
     db: Session,

@@ -141,12 +141,15 @@ def create_maintenance_request(
         risk_result = predict_risk(ml_features)
 
     except Exception as exc:
+        import traceback
+        traceback.print_exc()
+
         db.rollback()
 
         raise HTTPException(
             status_code=502,
             detail=(
-                "ML risk service unavailable or failed: "
+                "AI optimization service failed: "
                 f"{str(exc)}"
             ),
         )
@@ -329,3 +332,19 @@ def create_maintenance_request(
     db.refresh(maintenance_request)
 
     return maintenance_request
+
+
+@router.get(
+    "/",
+    response_model=list[MaintenanceRequestResponse],
+)
+def get_maintenance_requests(
+    db: Session = Depends(get_db),
+):
+    requests = (
+        db.query(MaintenanceRequest)
+        .order_by(MaintenanceRequest.id.desc())
+        .all()
+    )
+
+    return requests

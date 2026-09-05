@@ -68,6 +68,12 @@ def _calculate_days_overdue(
     if not last_maintenance_date:
         return 0
 
+    if reported_at.tzinfo is not None:
+        reported_at = reported_at.replace(tzinfo=None)
+
+    if last_maintenance_date.tzinfo is not None:
+        last_maintenance_date = last_maintenance_date.replace(tzinfo=None)
+
     delta = reported_at - last_maintenance_date
     return max(0, delta.days)
 

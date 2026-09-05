@@ -27,18 +27,21 @@ export default function NewRequestPage({ onSubmitted }) {
 
   function fillSampleData() {
     setForm({
-      asset_id: "A-001",
-      section: "MAS-CHE",
-      description: "Repeated rail defect detected near KM 42, moderate wear observed on inner rail.",
+      asset_id: "AST000001",
+      section: "SEC00001",
+      description: "Rail defect requiring urgent maintenance",
       duration_minutes: "120",
       category: "TRACK_DEFECT",
       severity: "HIGH",
-      maintenance_type: MAINTENANCE_TYPES[0],
+      maintenance_type: "Corrective",
       urgency_remarks: "Repeated defect, needs attention within 48 hours",
     });
+
     if (extraFields.length > 0) {
       const sampleDeptData = {};
-      extraFields.forEach((f) => { sampleDeptData[f.id] = "Sample value"; });
+      extraFields.forEach((f) => {
+        sampleDeptData[f.id] = "Sample value";
+      });
       setDeptData(sampleDeptData);
     }
   }
@@ -56,9 +59,16 @@ export default function NewRequestPage({ onSubmitted }) {
     try {
       const departmentInfo = ROLES.find((r) => r.id === user.role);
       await createRequest({
-        ...form,
-        duration_minutes: Number(form.duration_minutes),
-        department: departmentInfo.apiValue, // sends "ENGINEERING", not "Engineering"
+        asset_id: form.asset_id,
+        department: departmentInfo.apiValue,
+        section_id: form.section,
+        category: form.category,
+        severity: form.severity,
+        raw_text: form.description,
+        reported_at: new Date().toISOString(),
+        required_duration_minutes: Number(form.duration_minutes),
+        maintenance_type: form.maintenance_type.toUpperCase(),
+        urgency_remarks: form.urgency_remarks,
         department_fields: deptData,
       });
       setSuccess(true);
