@@ -45,3 +45,17 @@ export const mockHighRiskAssets = [
   { id: "SIG_012", type: "Signal Interlocking", location: "Km 148 Junction", riskScore: 0.65, priority: "MEDIUM", department: "S&T" },
   { id: "TRK_088", type: "Turnout Switch", location: "Km 89 Switch 4B", riskScore: 0.92, priority: "CRITICAL", department: "Engineering" },
 ];
+
+export const mockYardAvailability = [
+  { id: 'LOCO-WAP7-3021', type: 'Electric Passenger', status: 'READY', depot: 'NDLS Coaching Depot', nextTurnaround: '18:30 IST' },
+  { id: 'LOCO-WAG9-4102', type: 'Electric Freight', status: 'OVERHAUL', depot: 'CNB Locomotive Shed', nextTurnaround: '06:00 IST (Tomorrow)' },
+  { id: 'LOCO-WAP5-3008', type: 'Electric Passenger', status: 'IN_INSPECTION', depot: 'GZB Depot', nextTurnaround: '21:15 IST' },
+];
+
+export const mockEmergencyAlert = {
+  id: 'ALERT-LC-89',
+  title: 'CRITICAL: Obstacle Detected at Level Crossing LC-89',
+  location: 'Km 142 + 200 (NDLS-CNB UP Line)',
+  timestamp: 'Just now',
+  recommendedAction: 'Trigger Automatic Train Protection (ATP) Signal Halt',
+};
