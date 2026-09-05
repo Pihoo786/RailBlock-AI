@@ -27,7 +27,7 @@ export default function RailwayDashboard() {
   return (
     <div className="min-h-screen bg-[#F7F9FB] text-slate-800 font-sans flex flex-col md:flex-row relative">
       
-      {/* 🚨 Emergency Alert Panel Overlay */}
+      {/* Emergency Alert Panel Overlay */}
       {showAlert && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 md:p-8 max-w-lg w-full border-2 border-rose-500 shadow-2xl space-y-4">
@@ -112,7 +112,7 @@ export default function RailwayDashboard() {
             onClick={() => setShowAlert(true)}
             className="w-full text-left text-xs text-rose-600 font-bold hover:underline"
           >
-            ⚠️ Simulate LC Obstacle Alert
+             Simulate LC Obstacle Alert
           </button>
         </div>
       </aside>
