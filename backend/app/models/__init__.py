@@ -3,6 +3,7 @@ from app.models.models import (
     Section,
     Asset,
     Defect,
+    SignalFailure,
     MaintenanceRequest,
     RiskScore,
     TrainSchedule,
@@ -11,5 +12,4 @@ from app.models.models import (
     AuditLog,
     MaintenanceJob,
     Train,
-    SignalFailure,
 )
