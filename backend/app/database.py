@@ -44,5 +44,5 @@ def test_database_connection():
 from app.models.base import Base
 
 def create_tables():
-    from app.models.models import Train, Asset, MaintenanceJob, Block
+    from app.models import models
     Base.metadata.create_all(bind=engine)
