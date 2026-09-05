@@ -1,22 +1,28 @@
+import { useLanguage } from "../context/useLanguage";
+
 export default function SearchBox({ value, onChange, onSearch }) {
+  const { t } = useLanguage();
   return (
     <div className="mt-6">
-      <label className="text-sm text-gray-500">Enter your train number</label>
-      <div className="flex gap-2 mt-2">
+      <label className="text-xs font-semibold uppercase tracking-wide text-blue-100">
+        {t.searchLabel}
+      </label>
+      <div className="mt-2 flex flex-col gap-2 sm:flex-row">
         <input
           type="text"
           inputMode="numeric"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && onSearch()}
-          placeholder="e.g. 12627"
-          className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-[#2C5F8A]"
+          placeholder={t.searchPlaceholder}
+          aria-label={t.searchLabel}
+          className="min-w-0 flex-1 rounded-xl border border-white/20 bg-white px-4 py-3 text-base text-slate-900 outline-none focus:ring-2 focus:ring-blue-300"
         />
         <button
           onClick={onSearch}
-          className="px-5 py-3 rounded-xl bg-[#2C5F8A] text-white font-semibold hover:opacity-90"
+          className="rounded-xl bg-white px-5 py-3 font-bold text-blue-800 shadow-sm hover:bg-blue-50"
         >
-          Check Status
+          {t.searchBtn}
         </button>
       </div>
     </div>

@@ -26,6 +26,7 @@ export default function CheckStatusPage() {
 
     setLoading(true);
     setQuery(trimmed);
+    setResult(null);
     try {
       const data = await getTrainBlocks(trimmed);
       setResult(data);
@@ -39,19 +40,29 @@ export default function CheckStatusPage() {
     }
   }
 
+  const hasDisruption = result?.blocks?.length > 0;
+
   return (
-    <div className="max-w-md">
-      <h1 className="text-xl font-semibold text-gray-800">{t.checkStatusTitle}</h1>
-      <SearchBox value={query} onChange={setQuery} onSearch={() => runSearch(query)} />
+    <section className="max-w-3xl">
+      <div className="rounded-3xl bg-gradient-to-br from-blue-800 to-slate-900 p-6 text-white shadow-lg md:p-8">
+        <p className="text-sm font-semibold text-blue-200">Train information</p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+          {t.checkStatusTitle}
+        </h1>
+        <p className="mt-2 max-w-xl text-sm leading-6 text-slate-200">
+          Check passenger-visible maintenance blocks, affected sections and expected delays.
+        </p>
+        <SearchBox value={query} onChange={setQuery} onSearch={() => runSearch(query)} />
+      </div>
 
       {recent.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          <span className="text-xs text-gray-400 mr-1">{t.recentLabel}:</span>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-slate-500">{t.recentLabel}:</span>
           {recent.map((num) => (
             <button
               key={num}
               onClick={() => runSearch(num)}
-              className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-full text-gray-600"
+              className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600 hover:border-blue-300 hover:text-blue-700"
             >
               {num}
             </button>
@@ -59,13 +70,20 @@ export default function CheckStatusPage() {
         </div>
       )}
 
-      {loading && <p className="text-sm text-gray-400 mt-6">{t.loading}</p>}
-      {result?.error && <p className="text-sm text-red-500 mt-6">{t.errorMsg}</p>}
-      {result?.trainNotFound && <p className="text-sm text-gray-500 mt-6">{t.trainNotFound}</p>}
+      {loading && <p className="mt-8 text-sm text-slate-500">{t.loading}</p>}
+      {result?.error && <p className="mt-8 rounded-xl bg-red-50 p-4 text-sm text-red-700">{t.errorMsg}</p>}
+      {result?.trainNotFound && <p className="mt-8 rounded-xl bg-slate-100 p-4 text-sm text-slate-600">{t.trainNotFound}</p>}
+      {hasDisruption && (
+        <div className="mt-7">
+          <p className="mb-3 text-sm font-semibold text-slate-600">
+            Passenger update for train {result.train_number}
+          </p>
+          {result.blocks.map((block, i) => (
+            <StatusCard key={`${block.section}-${i}`} trainNumber={result.train_number} block={block} />
+          ))}
+        </div>
+      )}
       {result?.blocks?.length === 0 && <EmptyState query={result.train_number} />}
-      {result?.blocks?.map((block, i) => (
-        <StatusCard key={i} trainNumber={result.train_number} block={block} />
-      ))}
-    </div>
+    </section>
   );
 }

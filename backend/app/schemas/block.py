@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict
 
 
 class BlockCreate(BaseModel):
-    train_number: str
+    train_number: str | None = None
     section: str
     start_time: datetime
     end_time: datetime
@@ -17,7 +17,7 @@ class BlockCreate(BaseModel):
 
 class BlockResponse(BaseModel):
     id: int
-    train_number: str
+    train_number: str | None = None
     section: str
     start_time: datetime
     end_time: datetime

@@ -1,0 +1,193 @@
+{
+  "info": {
+    "name": "RailBlock AI - Person 4 E2E",
+    "_postman_id": "b9a7f4a4-4e41-4d90-9d22-railblock-p4",
+    "description": "End-to-end contract verification: request -> risk/optimization -> approval -> passenger update.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "assetId",
+      "value": "TRK-001"
+    },
+    {
+      "key": "sectionId",
+      "value": "SEC-CHN-KPD"
+    },
+    {
+      "key": "blockId",
+      "value": ""
+    },
+    {
+      "key": "trainNumber",
+      "value": "12627"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 - Submit maintenance request (Request -> Risk -> Optimization)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"asset_id\": \"{{assetId}}\", \"department\": \"TRACK\", \"section_id\": \"{{sectionId}}\", \"category\": \"Track\", \"severity\": \"HIGH\", \"raw_text\": \"Track maintenance required\", \"reported_at\": \"2026-09-05T09:00:00\", \"required_duration_minutes\": 120, \"maintenance_type\": \"Preventive\", \"urgency_remarks\": \"Planned maintenance\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/maintenance-requests/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "maintenance-requests",
+            ""
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Request accepted', () => pm.expect(pm.response.code).to.be.oneOf([201, 200]));",
+              "const body = pm.response.json();",
+              "pm.test('Request ID returned', () => pm.expect(body.request_id).to.match(/^MR-/));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - List blocks and capture latest recommended block",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/blocks/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "blocks",
+            ""
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Blocks endpoint OK', () => pm.expect(pm.response.code).to.equal(200));",
+              "const blocks = pm.response.json();",
+              "const candidate = blocks.slice().reverse().find(b => ['RECOMMENDED','APPROVED','ACTIVE'].includes(b.status));",
+              "pm.test('A demo block exists', () => pm.expect(candidate).to.exist);",
+              "if (candidate) pm.collectionVariables.set('blockId', candidate.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Control approval",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/blocks/{{blockId}}/approve",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "blocks",
+            "{{blockId}}",
+            "approve"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Approval succeeded', () => pm.expect(pm.response.code).to.equal(200));",
+              "pm.test('Block approved', () => pm.expect(pm.response.json().status).to.equal('APPROVED'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 - Passenger update (sanitized)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/passenger/trains/{{trainNumber}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "passenger",
+            "trains",
+            "{{trainNumber}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Passenger endpoint OK', () => pm.expect(pm.response.code).to.equal(200));",
+              "const body = pm.response.json();",
+              "const forbidden = ['risk_score','priority_score','priority_band','priority_reasons','optimization_explanation','request_id','asset_id','asset_code','department'];",
+              "const serialized = JSON.stringify(body);",
+              "forbidden.forEach(k => pm.test(`No internal field: ${k}`, () => pm.expect(serialized).to.not.include(`\\\"${k}\\\"`)));",
+              "if (body.blocks.length) { pm.test('Public reason code exists', () => pm.expect(body.blocks[0].reason_code).to.be.a('string')); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 - Passenger affected blocks list",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/passenger/blocks",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "passenger",
+            "blocks"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Passenger blocks endpoint OK', () => pm.expect(pm.response.code).to.equal(200));",
+              "const serialized = JSON.stringify(pm.response.json());",
+              "['risk_score','priority_score','priority_band','priority_reasons','optimization_explanation','request_id','asset_id','asset_code'].forEach(k => pm.test(`No internal field: ${k}`, () => pm.expect(serialized).to.not.include(`\\\"${k}\\\"`)));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

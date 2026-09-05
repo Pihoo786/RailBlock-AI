@@ -3,18 +3,18 @@ import { formatTime } from "../utils/formatTime";
 import RouteStrip from "./RouteStrip";
 
 const badgeStyles = {
-  SCHEDULED: "bg-blue-500",
-  APPROVED: "bg-emerald-600",
-  ACTIVE: "bg-orange-500",
-  COMPLETED: "bg-gray-400",
-  CANCELLED: "bg-red-500",
+  SCHEDULED: "bg-blue-100 text-blue-800",
+  APPROVED: "bg-emerald-100 text-emerald-800",
+  ACTIVE: "bg-orange-100 text-orange-800",
+  COMPLETED: "bg-slate-100 text-slate-700",
+  CANCELLED: "bg-red-100 text-red-800",
 };
 
 function Row({ label, value }) {
   return (
-    <div className="flex justify-between py-2 border-b border-gray-100 last:border-none">
-      <span className="text-sm text-gray-500">{label}</span>
-      <span className="font-semibold text-gray-800">{value}</span>
+    <div className="flex items-start justify-between gap-4 border-b border-slate-100 py-3 last:border-none">
+      <span className="text-sm text-slate-500">{label}</span>
+      <span className="text-right text-sm font-semibold text-slate-800">{value}</span>
     </div>
   );
 }
@@ -22,19 +22,25 @@ function Row({ label, value }) {
 export default function StatusCard({ trainNumber, block }) {
   const { t } = useLanguage();
   return (
-    <div className="mt-5 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
-      <Row label={t.rowTrain} value={trainNumber} />
+    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Passenger update</p>
+          <p className="mt-1 text-xl font-bold text-slate-900">Train {trainNumber}</p>
+        </div>
+        <span className={`rounded-full px-3 py-1 text-xs font-bold ${badgeStyles[block.status] || "bg-slate-100 text-slate-700"}`}>
+          {block.status}
+        </span>
+      </div>
       <Row label={t.rowSection} value={block.section} />
       <Row label={t.rowTime} value={`${formatTime(block.start_time)} – ${formatTime(block.end_time)}`} />
       <Row label={t.rowDelay} value={`${block.expected_delay_minutes} min`} />
       <Row label={t.rowReason} value={block.reason} />
-      <div className="flex justify-between py-2">
-        <span className="text-sm text-gray-500">{t.rowStatus}</span>
-        <span className={`text-white text-xs font-semibold px-3 py-1 rounded-full ${badgeStyles[block.status] || "bg-gray-400"}`}>
-          {block.status}
-        </span>
-      </div>
+      {block.reason_code && <Row label="Public reason code" value={block.reason_code} />}
       <RouteStrip section={block.section} />
-    </div>
+      <p className="mt-4 text-xs text-slate-400">
+        Only passenger-relevant information is shown. Internal risk, priority and optimization data are not published.
+      </p>
+    </article>
   );
 }

@@ -239,4 +239,24 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.sw?# Dataset files
+dataset/*.zip
+dataset/extracted/
+
+# Environment
+.env
+backend/.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# ML risk model - generated training data
+risk/ml_model/src/data/*.csv
+
+# ML evaluation plots
+risk/ml_model/reports/*.png
+
+# Local history snapshots
+.history/

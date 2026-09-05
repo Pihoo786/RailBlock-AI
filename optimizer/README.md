@@ -52,3 +52,22 @@ not combine Traffic, Power, or Disconnection blocks with a different type.
 
 Pass a rejected recommendation to `reoptimize_after_rejection`. Its candidate
 ID is excluded and CP-SAT returns the next best feasible block.
+
+## Person 1 unified deliverable
+
+`optimization_engine.py` is the integration facade for the complete Person 1
+module. It adds:
+
+- Multi-asset risk scoring for Track, Catenary/TRD, Locomotive, Coach and Wagon assets.
+- Age, condition, maintenance-cycle overdue, criticality, safety and history factors.
+- Co-planning helpers for compatible same-section maintenance work.
+- Rolling-stock clustering against recommended block windows and nearby sections/sheds.
+- JSON-safe output for direct FastAPI integration.
+- The existing OR-Tools CP-SAT planner remains the authoritative timetable and block-conflict solver.
+
+Main call:
+
+```python
+from optimizer.optimization_engine import optimize_multi_asset_plan
+result = optimize_multi_asset_plan(requests, trains, assets=assets, rolling_stock=rolling_stock, ml_outputs=ml_outputs)
+```

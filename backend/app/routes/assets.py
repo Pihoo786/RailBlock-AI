@@ -11,13 +11,23 @@ router = APIRouter(
     tags=["Assets"]
 )
 
-
 @router.get("/", response_model=list[AssetResponse])
 def get_assets(
     db: Session = Depends(get_db)
 ):
-    return db.query(Asset).all()
+    assets = db.query(Asset).all()
 
+    for asset in assets:
+        if asset.condition_score is None:
+            asset.condition_score = 0.0
+
+        if asset.criticality is None:
+            asset.criticality = 0.0
+
+        if asset.overdue_score is None:
+            asset.overdue_score = 0.0
+
+    return assets
 
 @router.post("/", response_model=AssetResponse)
 def create_asset(

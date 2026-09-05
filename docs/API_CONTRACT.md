@@ -107,3 +107,37 @@ SCHEDULED | APPROVED | ACTIVE | COMPLETED | CANCELLED
 - No auth required
 - Server-side filtering of internal fields (risk_score, priority, etc.)
 - CORS must allow http://localhost:5173 (dev)
+
+
+## Person 4 / QACore — Public Data Boundary
+
+The passenger endpoints are the **only public data surface** for passenger status.
+They use an explicit server-side allow-list DTO. Do not expose ORM objects directly.
+
+### GET /api/passenger/trains/{train_number}
+
+Passenger response fields are frozen to:
+`train_number`, `section`, `start_time`, `end_time`,
+`expected_delay_minutes`, `reason`, `reason_code`, `status`.
+
+### GET /api/passenger/blocks
+
+Returns the same public fields as a flat list.
+
+### Public reason codes
+
+- `TRACK_MAINTENANCE`
+- `OHE_INSPECTION`
+- `SIGNAL_MAINTENANCE`
+- `ELECTRICAL_WORK`
+- `STRUCTURE_MAINTENANCE`
+- `OTHER_MAINTENANCE`
+
+### QACore checks
+
+The Postman collection and pytest suite verify:
+1. request accepted;
+2. optimization produces a block;
+3. control approval changes the block to `APPROVED`;
+4. approved status reaches the passenger API;
+5. internal scoring, penalty, asset and optimization fields are absent from public JSON.

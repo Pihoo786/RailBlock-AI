@@ -3,12 +3,14 @@ export const mockTrainResponse = {
     train_number: "12627",
     blocks: [
       {
+        train_number: "12627",
         section: "Chennai - Katpadi",
-        start_time: "2026-08-26T10:00:00",
-        end_time: "2026-08-26T12:00:00",
+        start_time: "2026-09-05T10:00:00",
+        end_time: "2026-09-05T12:00:00",
         expected_delay_minutes: 25,
         reason: "Track maintenance",
-        status: "SCHEDULED",
+        reason_code: "TRACK_MAINTENANCE",
+        status: "APPROVED",
       },
     ],
   },
@@ -22,10 +24,11 @@ export const mockAllBlocks = [
   {
     train_number: "12627",
     section: "Chennai - Katpadi",
-    start_time: "2026-08-26T10:00:00",
-    end_time: "2026-08-26T12:00:00",
+    start_time: "2026-09-05T10:00:00",
+    end_time: "2026-09-05T12:00:00",
     expected_delay_minutes: 25,
     reason: "Track maintenance",
-    status: "SCHEDULED",
+    reason_code: "TRACK_MAINTENANCE",
+    status: "APPROVED",
   },
 ];

@@ -10,33 +10,32 @@ export default function Sidebar({ activePage, onNavigate }) {
   ];
 
   return (
-    <aside className="w-56 bg-white border-r border-gray-200 min-h-screen p-4 flex flex-col justify-between">
-      <div>
-        <div className="text-lg font-semibold text-[#2C5F8A] px-2 mb-6">🚆 {t.appName}</div>
-        <nav className="space-y-1">
+    <aside className="w-full shrink-0 border-b border-slate-200 bg-white md:min-h-screen md:w-60 md:border-b-0 md:border-r">
+      <div className="flex items-center justify-between p-4 md:sticky md:top-0 md:flex-col md:items-stretch md:p-5">
+        <div className="text-lg font-extrabold text-blue-800">🚆 {t.appName}</div>
+        <nav className="mt-0 flex gap-1 md:mt-8 md:flex-col">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${
+              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition md:w-full ${
                 activePage === item.id
-                  ? "bg-[#2C5F8A] text-white"
-                  : "text-gray-600 hover:bg-gray-100"
+                  ? "bg-blue-800 text-white"
+                  : "text-slate-600 hover:bg-slate-100"
               }`}
             >
-              <span>{item.icon}</span>
-              {item.label}
+              <span aria-hidden="true">{item.icon}</span>
+              <span className="hidden sm:inline">{item.label}</span>
             </button>
           ))}
         </nav>
+        <button
+          onClick={toggleLang}
+          className="ml-2 rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-500 hover:bg-slate-50 md:ml-0 md:mt-8"
+        >
+          {lang === "en" ? "हिंदी" : "English"}
+        </button>
       </div>
-
-      <button
-        onClick={toggleLang}
-        className="text-xs font-semibold text-gray-500 border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-100"
-      >
-        {lang === "en" ? "हिंदी में देखें" : "View in English"}
-      </button>
     </aside>
   );
 }
